@@ -1,2 +1,2 @@
 # Android-KeyStore-Example
-Simple Keystore example for securing important values inside app.
+Simple Android app showing how to use the Android Keystore to create and retrieve keypairs.
