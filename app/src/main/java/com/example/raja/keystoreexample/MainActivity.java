@@ -6,17 +6,11 @@ import android.os.Bundle;
 import android.security.KeyPairGeneratorSpec;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -41,26 +35,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private KeyStore keyStore;
     private AccountManager manager;
-    private Button onGenerate;
+    private Button onGenerate, onDelete, onGet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        (onGenerate = (Button) findViewById(R.id.button)).setOnClickListener(this);
+        (onGenerate = (Button) findViewById(R.id.button_set)).setOnClickListener(this);
+        (onGet = (Button) findViewById(R.id.button_get)).setOnClickListener(this);
+        (onDelete = (Button) findViewById(R.id.delete)).setOnClickListener(this);
         manager = AccountManager.get(this);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         try {
             keyStore = KeyStore.getInstance("AndroidKeyStore");
             keyStore.load(null);
@@ -77,26 +62,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void onGenerateClick() throws Exception {
-        String alias = ((EditText) findViewById(R.id.editText)).getText().toString();
+    private void deleteKey() {
+        ArrayList keyAliases = new ArrayList<>();
         try {
-            // Create new key if needed
-            if (!keyStore.containsAlias(alias)) {
-                Calendar start = Calendar.getInstance();
-                Calendar end = Calendar.getInstance();
-                end.add(Calendar.YEAR, 1);
-                KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(this)
-                        .setAlias(alias)
-                        .setSubject(new X500Principal("CN=Sample Name, O=Android Authority"))
-                        .setSerialNumber(BigInteger.ONE)
-                        .setStartDate(start.getTime())
-                        .setEndDate(end.getTime())
-                        .build();
+            Enumeration<String> aliases = keyStore.aliases();
+            String valueTest = keyStore.aliases().nextElement();
+            Log.e("Deleted", " - " + keyStore.aliases().nextElement());
+            keyStore.deleteEntry(valueTest);
+            while (aliases.hasMoreElements()) {
+                String value = aliases.nextElement();
+                keyAliases.add(value);
+                Log.e("Delete Key", aliases + " - " + value);
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Exception " + e.getMessage() + " occured", Toast.LENGTH_LONG).show();
         }
-        refreshKeys();
+    }
+
+    private void getKeyStore() {
+        ArrayList keyAliases = new ArrayList<>();
+        try {
+            Enumeration<String> aliases = keyStore.aliases();
+            while (aliases.hasMoreElements()) {
+                String value = aliases.nextElement();
+                keyAliases.add(value);
+                Log.e("Keystore Key", aliases + " - " + value);
+            }
+        } catch (Exception e) {
+        }
     }
 
     private void setKeyStoreUpdated() {
@@ -168,8 +160,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         try {
-//            onGenerateClick();
-            setKeyStoreUpdated();
+
+            switch (v.getId()) {
+                case R.id.button_set:
+                    setKeyStoreUpdated();
+                    break;
+                case R.id.delete:
+                    deleteKey();
+                    break;
+                case R.id.button_get:
+                    getKeyStore();
+                    break;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
