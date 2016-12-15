@@ -1,9 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    >
 
-    <include layout="@layout/content_main" />
+  <include
+      layout="@layout/content_main"
+      android:id="@+id/layout_entry"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      />
 
-</android.support.design.widget.CoordinatorLayout>
+  <android.support.v7.widget.ListViewCompat
+      android:id="@+id/listviewCompat"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@+id/layout_entry"
+      android:divider="@android:color/darker_gray"
+      android:dividerHeight="0.1dp"
+
+      ></android.support.v7.widget.ListViewCompat>
+
+</RelativeLayout>
